@@ -13,7 +13,16 @@
             
 
             <div id="gameScreen">
-                <canvas id="playArea" style="border:1px solid #ddd;"></canvas>
+                <div id="startScreen" class="center">
+                    <h1>¡2D Cowboy!</h1>
+                    <h2>Haz click para comenzar.</h2>
+                    <div id="startGame" onclick="makeTheGame()">
+                        <span class="center">Start</span>
+                    </div>
+                </div>
+
+
+                <canvas id="playArea" class="center" style="border:1px solid #ddd;"></canvas>
 
             </div>
 
