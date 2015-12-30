@@ -104,15 +104,12 @@
 		},
 		midpoint: function(){
 			return {
-				x: this.x + this.width/2,
+				x: this.x + this.width/2 - 10,
 				y: this.y + this.height/2 + 10
 			};
 		}
-
 		
 	};
-
-
 // END PLAYER
 
 
@@ -137,6 +134,37 @@
 
 	Mousetrap.bind("space", function() {
 		player.shoot();
+	});
+
+	Mousetrap.bind("esc", function() {
+		// RESET BACKGROUND
+		ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+		// RESET PLAYER POSITION
+		player.x = canvasWidth / 2;
+		player.y = canvasHeight - (heightPlayer);
+
+		// RESET OBSTACLES POSITION
+		obstacle1.x = Math.random() * canvasWidth / 2;
+		if (obstacle1.x >= canvasWidth / 2 - obstaclesWidth && obstacle1.x <= canvasWidth / 2 + obstaclesWidth ) {
+			obstacle1.x -= obstaclesWidth * 2; 
+		}
+
+		obstacle2.x = Math.random() * canvasWidth / 2 + (canvasWidth / 2);
+		if (obstacle2.x >= canvasWidth / 2 - obstaclesWidth && obstacle2.x <= canvasWidth / 2 + obstaclesWidth  ){
+			obstacle2.x += player.width * 2; 
+		} else if (obstacle2.x >= canvasWidth - player.width){
+			obstacle2.x -= obstaclesWidth * 2;
+		}
+
+		// CLEAR SHOOTS IN THE SCREEN
+		player.bullets = [];
+
+		// CLEAR ALL ENEMIES
+		enemiesA = [];
+		enemiesB = [];
+
+
 	});
 
 	// // konami code!
@@ -287,22 +315,24 @@
 // OBSTACLES OBJECTS
 	// GENERAL SETUP
 	var obstaclesWidth = 50;
-	var obstaclesHeight = 50;
-	var obstacleX = Math.random() * canvasWidth;
-	if (obstacleX >= canvasWidth / 2 - (player.width / 2 ) && obstacleX <= canvasWidth / 2 + (player.width / 2) ){
-		obstacleX += player.width * 2; 
+	var obstaclesHeight = 150;
+	var obstacleX = Math.random() * canvasWidth / 2;
+	if (obstacleX >= canvasWidth / 2 - (player.width ) && obstacleX <= canvasWidth / 2 + (player.width) ) {
+		obstacleX -= player.width * 2; 
 	}
 
-	var obstacle2X = Math.random() * canvasWidth;
-	if (obstacle2X >= canvasWidth / 2 - (player.width / 2 ) && obstacle2X <= canvasWidth / 2 + (player.width / 2) ){
-		obstacle2X += player.width * 2; 
+	var obstacle2X = Math.random() * canvasWidth / 2 + (canvasWidth / 2);
+	if (obstacle2X >= canvasWidth / 2 - (obstaclesWidth ) && obstacle2X <= canvasWidth / 2 + (obstaclesWidth ) ){
+		obstacle2X += obstaclesWidth * 2; 
+	} else if (obstacle2X >= canvasWidth - obstaclesWidth){
+		obstacle2X -= obstaclesWidth * 2;
 	}
 
 	var obstaclesY = canvasHeight - obstaclesHeight;
 
 	// OBSTACLE 1 SETUP
 	var obstacle1 = {
-		color: "#99ff00",
+		color: "#00ff00",
 		x: obstacleX,
 		y: obstaclesY,
 		width: obstaclesWidth,
@@ -342,8 +372,18 @@
 		a.y + a.height > b.y;
 	}
 
+	// WALLS ARE ACCORDING TO OBSTACLE WALLS, leftWallCollision means Obstacles Left Wall
+	function leftWallCollision(a, b){
+		return a.x + a.width >= b.x &&
+		a.x < b.x;
+	}
+	function rightWallCollision(a, b){
+		return a.x <= b.x + b.width &&
+		a.x + a.width > b.x + b.width;
+	}
+
 	function handleCollisions() {
-		// COLLISIONS WITH ENEMY A
+		// COLLISIONS BETWEEN BULLET AND ENEMY A
 		player.bullets.forEach(function(bullet) {
 			enemiesA.forEach(function(enemy) {
 				if (collides(bullet, enemy)) {
@@ -353,14 +393,7 @@
 			});
 		});
 
-		enemiesA.forEach(function(enemy) {
-			if (collides(enemy, player)) {
-				enemy.explode();
-				player.explode();
-			}
-		});
-
-		// COLLISIONS WITH ENEMY B
+		// COLLISION BETWEEN BULLET AND ENEMY B
 		player.bullets.forEach(function(bullet) {
 			enemiesB.forEach(function(enemy) {
 				if (collides(bullet, enemy)) {
@@ -370,20 +403,39 @@
 			});
 		});
 
-		enemiesB.forEach(function(enemy) {
+
+
+		// COLLISION BETWEEN PLAYER AND ENEMY A
+		enemiesA.forEach(function(enemy) {
 			if (collides(enemy, player)) {
-				enemy.explode();
-				player.explode();
+				// END GAME
+
 			}
 		});
+
+		// COLLISION BETWEEN PLAYER AND ENEMY B
+		enemiesB.forEach(function(enemy) {
+			if (collides(enemy, player)) {
+				// END GAME
+
+			}
+		});
+
+
+
+		// COLLISION BETWEEN PLAYER AND OBSTACULE 1
+		if(rightWallCollision(player,obstacle1)){
+			player.x = obstacle1.x + obstacle1.width;
+		}
+
+		// COLLISION BETWEEN PLAYER AND OBSTACULE 2
+		if(leftWallCollision(player,obstacle2)){
+			player.x = obstacle2.x - player.width;
+		}
+
 	}
 // END COLLISION
 
-// EXPLODE ACTIONS
-	player.explode = function(){
-		this.active = false;
-	}
-// END EXPLODES
 
 
 
@@ -433,8 +485,9 @@
 
 
 		// COLLISIONS DETECTION
-			handleCollisions();
-		// END COLLISIONS
+		handleCollisions();
+
+		console.log ("Bullets in the screen: " + player.bullets.length);
 	}
 
 	function draw (x) {
