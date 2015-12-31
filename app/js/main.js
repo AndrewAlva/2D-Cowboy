@@ -9,6 +9,10 @@ function makeTheGame () {
 			draw();
 		},1000/FPS);
 
+		// GAME BACKGROUND
+		var bgImg = document.getElementById("iBg");
+		var gameFloor = 65;
+
 
 		// Setup Canvas Play Area
 		var canvasWidth = 1000;
@@ -25,15 +29,14 @@ function makeTheGame () {
 
 	// SETUP PLAYER
 		// PLAYER PROPERTIES VALUES
-		var widthPlayer = 50;
-		var heightPlayer = 50;
+		var widthPlayer = 80;
+		var heightPlayer = 65;
 		var posXPlayer = canvasWidth / 2;
-		var posYPlayer = canvasHeight - (heightPlayer);
+		var posYPlayer = canvasHeight - heightPlayer - gameFloor;
 		var jumpPower = 0;
 		var jumpBoolean = false;
 		var jumpUp = false;
 		var jumpDown = false;
-
 
 		var player = {
 			color: "#00A",
@@ -43,10 +46,11 @@ function makeTheGame () {
 			height: heightPlayer,
 			lookRight: true,
 			speed: 10,
+			imgR: document.getElementById("iPR"),
+			imgL: document.getElementById("iPL"),
 			
-			draw: function() {
-				ctx.fillStyle = this.color;
-				ctx.fillRect(this.x, this.y, this.width, this.height);
+			draw: function(playerSprite) {
+				ctx.drawImage(playerSprite,this.x,this.y);
 			},
 			moveRight: function(){
 				this.x += this.speed;
@@ -75,11 +79,11 @@ function makeTheGame () {
 				if (jumpBoolean && jumpDown){
 					jumpPower += player.gravity;
 
-					if (player.y >= canvasHeight - (heightPlayer)) {
+					if (player.y >= canvasHeight - heightPlayer - gameFloor) {
 						jumpDown = false;
 						jumpBoolean = false;
 						jumpPower = 0;
-						player.y = canvasHeight - heightPlayer;
+						player.y = canvasHeight - heightPlayer - gameFloor;
 					}
 				}
 			},
@@ -110,13 +114,23 @@ function makeTheGame () {
 				}
 			},
 			midpoint: function(){
-				return {
-					x: this.x + this.width/2 - 10,
-					y: this.y + this.height/2 + 10
-				};
+				if (playerOrientation == player.imgR) {
+					return {
+						x: this.x + this.width - 5,
+						y: this.y + this.height/2 + 9
+					}
+
+				} else {
+					return {
+						x: this.x,
+						y: this.y + this.height/2 + 9
+					}
+				}
 			}
-			
 		};
+
+
+		var playerOrientation = player.imgR;
 	// END PLAYER
 
 
@@ -135,11 +149,13 @@ function makeTheGame () {
 		// MOVE PLAYER TO RIGHT TRIGGER
 		Mousetrap.bind("right", function() {
 			player.moveRight();
+			playerOrientation = player.imgR;
 		});
 
 		// MOVE PLAYER TO LEFT TRIGGER
 		Mousetrap.bind("left", function() {
 			player.moveLeft();
+			playerOrientation = player.imgL;
 		});
 
 		// JUMP TRIGGER
@@ -154,15 +170,6 @@ function makeTheGame () {
 		Mousetrap.bind("space", function() {
 			player.shoot();
 		});
-
-		// // konami code!
-		// Mousetrap.bind('left down right enter', function() {
-		//     testMT('Hadou Ken!');
-		// });
-
-		// function testMT (keyPressed) {
-		// 	alert('Mousetrap working, key pressed: ' + keyPressed);
-		// }
 	// END KEY PRESS CONTROLS
 
 	// RESET GAME TRIGGER
@@ -173,9 +180,10 @@ function makeTheGame () {
 				resetScreen.classList.add("hidden");
 				ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-				// RESET PLAYER POSITION
+				// RESET PLAYER VALUES
 				player.x = canvasWidth / 2;
-				player.y = canvasHeight - (heightPlayer);
+				player.y = canvasHeight - heightPlayer - gameFloor;
+				player.speed = 10;
 
 
 				// CLEAR SHOOTS IN THE SCREEN
@@ -204,9 +212,9 @@ function makeTheGame () {
 
 			I.xVelocity = I.speed;
 			I.yVelocity = 0;
-			I.width = 20;
-			I.height = 3;
-			I.color = "#ff0000";
+			I.width = 5;
+			I.height = 4;
+			I.color = "#ffffff";
 
 			// PLAY AREA LIMITS
 			I.inBounds = function() {
@@ -241,15 +249,14 @@ function makeTheGame () {
 
 			I.active = true;
 
-			I.color = "#ffff00";
+			I.img = document.getElementById("iE2"),
 
 			I.width = 50;
-			I.height = 50;
+			I.height = 57;
 
 			I.x = canvasWidth - I.width;
-			I.y = canvasHeight - I.height;
+			I.y = canvasHeight - I.height - gameFloor;
 			I.xVelocity = -2;
-			I.yVelocity = 0;
 
 
 			I.inBounds = function() {
@@ -258,13 +265,11 @@ function makeTheGame () {
 			};
 
 			I.draw = function() {
-				ctx.fillStyle = this.color;
-				ctx.fillRect(this.x, this.y, this.width, this.height);
+				ctx.drawImage(this.img,this.x,this.y);
 			};
 
 			I.update = function() {
 				I.x += I.xVelocity;
-				I.y += I.yVelocity;
 
 				I.xVelocity = -5;
 
@@ -289,15 +294,14 @@ function makeTheGame () {
 
 			I.active = true;
 
-			I.color = "#00ffff";
+			I.img = document.getElementById("iE1"),
 
 			I.width = 50;
-			I.height = 50;
+			I.height = 57;
 
 			I.x = I.width;
-			I.y = canvasHeight - I.height;
+			I.y = canvasHeight - I.height - gameFloor;
 			I.xVelocity = 1.5;
-			I.yVelocity = 0;
 
 
 			I.inBounds = function() {
@@ -306,13 +310,11 @@ function makeTheGame () {
 			};
 
 			I.draw = function() {
-				ctx.fillStyle = this.color;
-				ctx.fillRect(this.x, this.y, this.width, this.height);
+				ctx.drawImage(this.img,this.x,this.y);
 			};
 
 			I.update = function() {
 				I.x += I.xVelocity;
-				I.y += I.yVelocity;
 
 				I.xVelocity = 5;
 
@@ -331,40 +333,31 @@ function makeTheGame () {
 
 	// OBSTACLES OBJECTS
 		// GENERAL SETUP
-		var obstaclesWidth = 50;
-		var obstaclesHeight = 150;
-
-		var obstacleX = 200;
-		var obstacle2X = canvasWidth - 200;
-
-		var obstaclesY = canvasHeight - obstaclesHeight;
 
 		// OBSTACLE 1 SETUP
 		var obstacle1 = {
-			color: "#00ff00",
-			x: obstacleX,
-			y: obstaclesY,
-			width: obstaclesWidth,
-			height: obstaclesHeight,
+			width: 50,
+			height: 206,
+			x: 200,
+			y: canvasHeight - gameFloor - 206,
+			img: document.getElementById("iO1"),
 
 			draw: function() {
-				ctx.fillStyle = this.color;
-				ctx.fillRect(this.x, this.y, this.width, this.height);
-			},
+				ctx.drawImage(this.img,this.x,this.y);
+			}
 		};
 
 		// OBSTACLE 2 SETUP
 		var obstacle2 = {
-			color: "#ff00ff",
-			x: obstacle2X,
-			y: obstaclesY,
-			width: obstaclesWidth,
-			height: obstaclesHeight,
+			width: 59,
+			height: 50,
+			x: canvasWidth -400,
+			y: canvasHeight - gameFloor - 130,
+			img: document.getElementById("iO2"),
 
 			draw: function() {
-				ctx.fillStyle = this.color;
-				ctx.fillRect(this.x, this.y, this.width, this.height);
-			},
+				ctx.drawImage(this.img,this.x,this.y);
+			}
 		};
 	// END OBSTACLES
 
@@ -382,16 +375,6 @@ function makeTheGame () {
 			a.x + a.width > b.x &&
 			a.y < b.y + b.height &&
 			a.y + a.height > b.y;
-		}
-
-		// WALLS ARE ACCORDING TO OBSTACLE WALLS, leftWallCollision means Obstacles Left Wall
-		function leftWallCollision(a, b){
-			return a.x + a.width >= b.x &&
-			a.x < b.x;
-		}
-		function rightWallCollision(a, b){
-			return a.x <= b.x + b.width &&
-			a.x + a.width > b.x + b.width;
 		}
 
 		function handleCollisions() {
@@ -442,13 +425,13 @@ function makeTheGame () {
 
 
 			// COLLISION BETWEEN PLAYER AND OBSTACULE 1
-			if(rightWallCollision(player,obstacle1)){
+			if(collides(player,obstacle1)){
 				player.x = obstacle1.x + obstacle1.width;
 			}
 
 			// COLLISION BETWEEN PLAYER AND OBSTACULE 2
-			if(leftWallCollision(player,obstacle2)){
-				player.x = obstacle2.x - player.width;
+			if(collides(player,obstacle2)){
+				player.y = obstacle2.y + obstacle2.height;
 			}
 
 		}
@@ -549,7 +532,15 @@ function makeTheGame () {
 
 		function draw (x) {
 			ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-			// USER INTERFACE DRAW
+
+			// ENVIRONMENT
+			ctx.drawImage(bgImg,0,0);
+	  		player.draw(playerOrientation);
+	  		obstacle1.draw();
+	  		obstacle2.draw();
+
+
+			// USER INTERFACE
 				// UI TITLE
 				userInterface.displayInfo( userInterface.titleStyle, userInterface.titleFill, userInterface.titleAlign, userInterface.titleContent, userInterface.titleX, userInterface.titleY  );
 				
@@ -565,17 +556,11 @@ function makeTheGame () {
 				// UI DIFFICULT
 				userInterface.displayInfo( userInterface.genStyle, userInterface.genFill, userInterface.genAlign, userInterface.difficultName + userInterface.difficult, userInterface.genX, userInterface.difficultY  );
 
-			// ENVIRONMENT DRAW
-	  		player.draw();
-	  		obstacle1.draw();
-	  		obstacle2.draw();
 
 	  		// BULLETS
 	  		player.bullets.forEach(function(bullet) {
 				bullet.draw();
 			});
-
-
 
 			// ENEMIES A
 			enemiesA.forEach(function(enemy) {
