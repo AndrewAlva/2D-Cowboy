@@ -13,13 +13,20 @@
             
 
             <div id="gameScreen">
-                <div id="startScreen" class="center">
-                    <h1>¡2D Cowboy!</h1>
-                    <h2>Haz click para comenzar.</h2>
+                <div id="startScreen" class="gameFramework center">
+                    <h1 class="gameTitle">¡2D Cowboy!</h1>
+                    <h2 class="gameQuote">Haz click para comenzar.</h2>
                     <div id="startGame" onclick="makeTheGame()">
                         <span class="center">Start</span>
                     </div>
                 </div>
+
+                <div id="resetScreen" class="gameFramework center hidden">
+                    <h1 class="gameTitle">¡Game Over!</h1>
+                    <h2 class="gameQuote">Presiona la tecla <span>"Esc"</span> para reiniciar el juego.</h2>
+
+                </div>
+
 
 
                 <canvas id="playArea" class="center" style="border:1px solid #ddd;"></canvas>

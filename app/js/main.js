@@ -11,8 +11,8 @@ function makeTheGame () {
 
 
 		// Setup Canvas Play Area
-		var canvasWidth = 1280;
-		var canvasHeight = 720;
+		var canvasWidth = 1000;
+		var canvasHeight = 652;
 
 		var c = document.getElementById("playArea");
 		c.setAttribute("width", canvasWidth);
@@ -20,12 +20,13 @@ function makeTheGame () {
 		var ctx = c.getContext("2d");
 
 		var gameOver = false;
+		var resetOn = false;
 	// END SETUP CANVAS
 
 	// SETUP PLAYER
 		// PLAYER PROPERTIES VALUES
-		var widthPlayer = 15;
-		var heightPlayer = 130;
+		var widthPlayer = 50;
+		var heightPlayer = 50;
 		var posXPlayer = canvasWidth / 2;
 		var posYPlayer = canvasHeight - (heightPlayer);
 		var jumpPower = 0;
@@ -56,8 +57,8 @@ function makeTheGame () {
 				this.lookRight = false;
 			},
 
-			gravity: 1,
-			jumpHeight: 12, 
+			gravity: 1.8,
+			jumpHeight: 15, 
 
 			jumping: function(){
 				this.y += jumpPower;
@@ -78,6 +79,7 @@ function makeTheGame () {
 						jumpDown = false;
 						jumpBoolean = false;
 						jumpPower = 0;
+						player.y = canvasHeight - heightPlayer;
 					}
 				}
 			},
@@ -100,6 +102,12 @@ function makeTheGame () {
 						y: bulletPosition.y
 					}));
 				}
+
+				userInterface.bullets += 1;
+				userInterface.score -= 2;
+				if (userInterface.score < 0){
+					userInterface.score = 0;
+				}
 			},
 			midpoint: function(){
 				return {
@@ -114,6 +122,7 @@ function makeTheGame () {
 
 	// INIT GAME
 		var startScreen = document.getElementById("startScreen");
+		var resetScreen = document.getElementById("resetScreen");
 
 		startScreen.classList.add("hidden");
 	// END INIT GAME
@@ -123,14 +132,17 @@ function makeTheGame () {
 
 
 	// KEY PRESS CONTROLS
+		// MOVE PLAYER TO RIGHT TRIGGER
 		Mousetrap.bind("right", function() {
 			player.moveRight();
 		});
 
+		// MOVE PLAYER TO LEFT TRIGGER
 		Mousetrap.bind("left", function() {
 			player.moveLeft();
 		});
 
+		// JUMP TRIGGER
 		Mousetrap.bind("up", function() {
 			if (jumpBoolean == false) {
 				jumpBoolean = true;
@@ -138,40 +150,9 @@ function makeTheGame () {
 			}
 		});
 
+		// SHOOT TRIGGER
 		Mousetrap.bind("space", function() {
 			player.shoot();
-		});
-
-		Mousetrap.bind("esc", function() {
-			// RESET GAME
-			gameOver = false;
-			ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-			// RESET PLAYER POSITION
-			player.x = canvasWidth / 2;
-			player.y = canvasHeight - (heightPlayer);
-
-			// RESET OBSTACLES POSITION
-			obstacle1.x = Math.random() * canvasWidth / 2;
-			if (obstacle1.x >= canvasWidth / 2 - obstaclesWidth && obstacle1.x <= canvasWidth / 2 + obstaclesWidth ) {
-				obstacle1.x -= obstaclesWidth * 2; 
-			}
-
-			obstacle2.x = Math.random() * canvasWidth / 2 + (canvasWidth / 2);
-			if (obstacle2.x >= canvasWidth / 2 - obstaclesWidth && obstacle2.x <= canvasWidth / 2 + obstaclesWidth  ){
-				obstacle2.x += player.width * 2; 
-			} else if (obstacle2.x >= canvasWidth - player.width){
-				obstacle2.x -= obstaclesWidth * 2;
-			}
-
-			// CLEAR SHOOTS IN THE SCREEN
-			player.bullets = [];
-
-			// CLEAR ALL ENEMIES
-			enemiesA = [];
-			enemiesB = [];
-
-
 		});
 
 		// // konami code!
@@ -183,6 +164,38 @@ function makeTheGame () {
 		// 	alert('Mousetrap working, key pressed: ' + keyPressed);
 		// }
 	// END KEY PRESS CONTROLS
+
+	// RESET GAME TRIGGER
+		Mousetrap.bind("esc", function() {
+			
+			if(resetOn){
+				gameOver = false;
+				resetScreen.classList.add("hidden");
+				ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+				// RESET PLAYER POSITION
+				player.x = canvasWidth / 2;
+				player.y = canvasHeight - (heightPlayer);
+
+
+				// CLEAR SHOOTS IN THE SCREEN
+				player.bullets = [];
+
+				// RESET INTERFACE
+				userInterface.bullets = 0;
+				userInterface.score = 0;
+				userInterface.difficult = 1;
+
+				// CLEAR ALL ENEMIES
+				enemiesA = [];
+				enemiesB = [];
+
+				// BLOCK RESET UNTIL USER LOOSE
+				resetOn = false;
+			}
+
+		});
+	// END RESET GAME
 
 
 	// SHOOTING OBJECTS
@@ -230,12 +243,12 @@ function makeTheGame () {
 
 			I.color = "#ffff00";
 
-			I.width = 15;
-			I.height = 90;
+			I.width = 50;
+			I.height = 50;
 
 			I.x = canvasWidth - I.width;
 			I.y = canvasHeight - I.height;
-			I.xVelocity = -2
+			I.xVelocity = -2;
 			I.yVelocity = 0;
 
 
@@ -278,12 +291,12 @@ function makeTheGame () {
 
 			I.color = "#00ffff";
 
-			I.width = 20;
-			I.height = 60;
+			I.width = 50;
+			I.height = 50;
 
 			I.x = I.width;
 			I.y = canvasHeight - I.height;
-			I.xVelocity = 1.5
+			I.xVelocity = 1.5;
 			I.yVelocity = 0;
 
 
@@ -320,17 +333,9 @@ function makeTheGame () {
 		// GENERAL SETUP
 		var obstaclesWidth = 50;
 		var obstaclesHeight = 150;
-		var obstacleX = Math.random() * canvasWidth / 2;
-		if (obstacleX >= canvasWidth / 2 - (player.width ) && obstacleX <= canvasWidth / 2 + (player.width) ) {
-			obstacleX -= player.width * 2; 
-		}
 
-		var obstacle2X = Math.random() * canvasWidth / 2 + (canvasWidth / 2);
-		if (obstacle2X >= canvasWidth / 2 - (obstaclesWidth ) && obstacle2X <= canvasWidth / 2 + (obstaclesWidth ) ){
-			obstacle2X += obstaclesWidth * 2; 
-		} else if (obstacle2X >= canvasWidth - obstaclesWidth){
-			obstacle2X -= obstaclesWidth * 2;
-		}
+		var obstacleX = 200;
+		var obstacle2X = canvasWidth - 200;
 
 		var obstaclesY = canvasHeight - obstaclesHeight;
 
@@ -363,9 +368,12 @@ function makeTheGame () {
 		};
 	// END OBSTACLES
 
-
-
-
+	// INCREASE DIFFICULT
+		setInterval(function(){
+			userInterface.difficult += 1;
+			player.speed += 5;
+		},10000);
+	// END INCREASE
 
 
 	// COLLISION DETECTION
@@ -393,6 +401,7 @@ function makeTheGame () {
 					if (collides(bullet, enemy)) {
 						enemy.explode();
 						bullet.active = false;
+						userInterface.score += 5;
 					}
 				});
 			});
@@ -403,6 +412,7 @@ function makeTheGame () {
 					if (collides(bullet, enemy)) {
 						enemy.explode();
 						bullet.active = false;
+						userInterface.score += 5;
 					}
 				});
 			});
@@ -414,7 +424,8 @@ function makeTheGame () {
 				if (collides(enemy, player)) {
 					// END GAME
 					gameOver = true;
-
+					resetOn = true;
+					resetScreen.classList.remove("hidden");
 				}
 			});
 
@@ -423,7 +434,8 @@ function makeTheGame () {
 				if (collides(enemy, player)) {
 					// END GAME
 					gameOver = true;
-
+					resetOn = true;
+					resetScreen.classList.remove("hidden");
 				}
 			});
 
@@ -441,6 +453,48 @@ function makeTheGame () {
 
 		}
 	// END COLLISION
+
+
+
+
+	// USER INTERFACE INDICATORS
+		var userInterface = {
+			titleContent: "2D Cowboy",
+			titleX: canvasWidth / 2,
+			titleY: 20,
+			titleStyle: "18px Helvetica",
+			titleFill: "#fff",
+			titleAlign: "center",
+
+			userContent: "Player 1",
+			userY: 30,
+			userFill: "#00ffff",
+			
+			genX: 50,
+			genStyle: "15px Helvetica",
+			genFill: "#eee",
+			genAlign: "left",
+
+			bulletsName: "Bullets Fired: ",
+			bullets: 0,
+			bulletsY: 60,
+
+			scoreName: "Score: ",
+			score: 0,
+			scoreY: 80,
+
+			difficultName: "Difficult: ",
+			difficult: 1,
+			difficultY: 100,
+
+			displayInfo: function(styleInfo, fillColor, styleAlign, textContent, textX, textY){
+				ctx.font = styleInfo;
+				ctx.fillStyle = fillColor;
+				ctx.textAlign = styleAlign;
+				ctx.fillText(textContent, textX, textY); 
+			},
+		}; 
+	// END USER INTERFACE
 
 
 	// SETUP GAME RENDER CYCLES
@@ -469,7 +523,7 @@ function makeTheGame () {
 					return enemy.active;
 				});
 
-				if(Math.random() < 0.03) {
+				if(Math.random() < userInterface.difficult / 50) {
 					enemiesA.push(EnemyA());
 				}
 
@@ -482,7 +536,7 @@ function makeTheGame () {
 					return enemy.active;
 				});
 
-				if(Math.random() < 0.03) {
+				if(Math.random() < userInterface.difficult / 50) {
 					enemiesB.push(EnemyB());
 				}
 			// END ENEMIES MOVE
@@ -495,6 +549,23 @@ function makeTheGame () {
 
 		function draw (x) {
 			ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+			// USER INTERFACE DRAW
+				// UI TITLE
+				userInterface.displayInfo( userInterface.titleStyle, userInterface.titleFill, userInterface.titleAlign, userInterface.titleContent, userInterface.titleX, userInterface.titleY  );
+				
+				// UI USER
+				userInterface.displayInfo( userInterface.genStyle, userInterface.userFill, userInterface.genAlign, userInterface.userContent, userInterface.genX, userInterface.userY  );
+
+				// UI BULLETS
+				userInterface.displayInfo( userInterface.genStyle, userInterface.genFill, userInterface.genAlign, userInterface.bulletsName + userInterface.bullets, userInterface.genX, userInterface.bulletsY  );
+
+				// UI SCORE
+				userInterface.displayInfo( userInterface.genStyle, userInterface.genFill, userInterface.genAlign, userInterface.scoreName + userInterface.score, userInterface.genX, userInterface.scoreY  );
+
+				// UI DIFFICULT
+				userInterface.displayInfo( userInterface.genStyle, userInterface.genFill, userInterface.genAlign, userInterface.difficultName + userInterface.difficult, userInterface.genX, userInterface.difficultY  );
+
+			// ENVIRONMENT DRAW
 	  		player.draw();
 	  		obstacle1.draw();
 	  		obstacle2.draw();
