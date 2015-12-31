@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="2D-Cowboy Game">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>2D-Cowboy</title>
+        <link rel="stylesheet" href="css/main.min.css">
+    </head>
+    <body>
+        <div id="fullWrapper">
+            <div id="gameScreen">
+                <div id="startScreen" class="gameFramework center">
+                    <h1 class="gameTitle">¡Survival Cowboy!</h1>
+                    <h2 class="gameQuote">Haz click para comenzar.</h2>
+                    <div id="startGame" onclick="makeTheGame()">
+                        <span class="center">Start</span>
+                    </div>
+                </div>
+
+                <div id="resetScreen" class="gameFramework center hidden">
+                    <h1 class="gameTitle">¡Game Over!</h1>
+                    <h2 class="gameQuote">Presiona la tecla <span>"Esc"</span> para reiniciar el juego.</h2>
+
+                </div>
+
+
+
+                <canvas id="playArea" class="center" style="border:1px solid #ddd;"></canvas>
+
+            </div>
+
+            <div id="imgLibrary" class="hidden">
+                <img id="iBg" src="img/background.jpg" alt="">
+                <img id="iPR" src="img/player-r.png" alt="">
+                <img id="iPL" src="img/player-l.png" alt="">
+                <img id="iE1" src="img/enemy1.png" alt="">
+                <img id="iE2" src="img/enemy2.png" alt="">
+                <img id="iO1" src="img/obstacle1.png" alt="">
+                <img id="iO2" src="img/obstacle2.png" alt="">
+            </div>
+
+        </div>
+        <script src="js/vendor/mousetrap.min.js"></script>
+        <script src="js/main.min.js"></script>
+    </body>
+</html>
